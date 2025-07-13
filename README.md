@@ -51,3 +51,43 @@ curl http://localhost:9200/courses/_search?pretty
 ### Sample:
 ```http
 GET /api/search?q=art&minPrice=10&sort=priceDesc&page=0&size=5
+
+```
+📘 How to Test the Search API
+Make sure:
+
+Elasticsearch is running (docker-compose up)
+
+Spring Boot app is running (localhost:8080)
+
+
+### 1. Basic keyword search
+curl "http://localhost:8080/api/search?q=math"
+
+### 2. Filter by category and type
+curl "http://localhost:8080/api/search?category=Math&type=COURSE"
+
+### 3. Filter by age range
+curl "http://localhost:8080/api/search?minAge=6&maxAge=10"
+
+### 4. Price range + sorting
+curl "http://localhost:8080/api/search?minPrice=20&maxPrice=100&sort=priceAsc"
+
+### 5. Future sessions only
+curl "http://localhost:8080/api/search?startDate=2025-07-15T00:00:00Z"
+
+### 6. Full-text search + pagination
+curl "http://localhost:8080/api/search?q=science&page=0&size=5"
+
+
+## ✅ Testing the Application
+
+### Prerequisites
+- Elasticsearch running locally (`localhost:9200`)
+- Spring Boot app running (`localhost:8080`)
+
+### Sample CURL Commands
+```bash
+curl "http://localhost:8080/api/search?q=math"
+curl "http://localhost:8080/api/search?category=Science&type=COURSE&minAge=7"
+
