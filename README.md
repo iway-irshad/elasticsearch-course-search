@@ -34,3 +34,20 @@ After starting the app and Elasticsearch (via `docker-compose up`), visit:
 
 ```bash
 curl http://localhost:9200/courses/_search?pretty
+
+```
+## 🔍 Search API
+
+**Endpoint:** `GET /api/search`
+
+### Query Parameters:
+- `q` – full-text keyword search (title, description)
+- `category`, `type` – exact match
+- `minAge`, `maxAge`, `minPrice`, `maxPrice` – numeric filters
+- `startDate` – ISO-8601 datetime filter (from session date)
+- `sort` – `upcoming` (default), `priceAsc`, `priceDesc`
+- `page`, `size` – for pagination
+
+### Sample:
+```http
+GET /api/search?q=art&minPrice=10&sort=priceDesc&page=0&size=5
