@@ -2,12 +2,12 @@ package com.undoschool.coursesearch.service;
 
 import co.elastic.clients.elasticsearch.*;
 import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.FieldSuggester;
+import co.elastic.clients.elasticsearch.core.search.Suggestion;
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.util.ObjectBuilder;
 import com.undoschool.coursesearch.dto.CourseSearchResponse;
 import com.undoschool.coursesearch.dto.CourseSearchRequest;
 import com.undoschool.coursesearch.model.CourseDocument;
@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
+
+import static org.apache.naming.SelectorContext.prefix;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +31,19 @@ public class SearchService {
 
             // Full-text search
             if (request.getKeyword() != null && !request.getKeyword().isBlank()) {
-                boolQuery.must(MultiMatchQuery.of(m -> m
-                        .fields("title", "description")
+                boolQuery.must(MatchQuery.of(m -> m
+                        .field("title")
+                        .query(request.getKeyword())
+                        .fuzziness("AUTO") // 🔥 Fuzzy match
+                )._toQuery());
+
+                // Optional: also add full-text match on description (without fuzziness)
+                boolQuery.must(MatchQuery.of(m -> m
+                        .field("description")
                         .query(request.getKeyword())
                 )._toQuery());
             }
+
 
             // Exact match filters
             if (request.getCategory() != null) {
@@ -119,5 +130,34 @@ public class SearchService {
         } catch (Exception e) {
             throw new RuntimeException("Error while searching courses", e);
         }
+        List<String> suggestCourseTitles(String prefix) {
+            try {
+                Suggestion suggest = Suggestion.of(s -> s
+                        .prefix(prefix)
+                        .completion(c -> c
+                                .field("suggest")
+                                .skipDuplicates(true)
+                                .size(10)
+                        )
+                );
+
+                SearchResponse<CourseDocument> response = elasticsearchClient.search(s -> s
+                                .index("courses")
+                                .suggest(sug -> sug
+                                        .suggesters("course-suggest", suggest)
+                                ),
+                        CourseDocument.class
+                );
+
+                return response.suggest().get("course-suggest").stream()
+                        .map(s -> s.completion().text())
+                        .distinct()
+                        .toList();
+
+            } catch (Exception e) {
+                throw new RuntimeException("Error in autocomplete", e);
+            }
+        }
+
     }
 }

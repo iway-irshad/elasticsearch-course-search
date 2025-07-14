@@ -87,7 +87,31 @@ curl "http://localhost:8080/api/search?q=science&page=0&size=5"
 - Spring Boot app running (`localhost:8080`)
 
 ### Sample CURL Commands
+
 ```bash
 curl "http://localhost:8080/api/search?q=math"
 curl "http://localhost:8080/api/search?category=Science&type=COURSE&minAge=7"
 
+```
+## ✨ Autocomplete Suggestions
+
+**Endpoint:** `GET /api/search/suggest?q=prefix`
+
+Returns up to 10 autocomplete suggestions based on course title.
+
+### Example:
+
+```bash
+curl "http://localhost:8080/api/search/suggest?q=phy"
+
+```
+## 🔍 Fuzzy Search Support
+
+When performing a keyword search (`q` param), the system supports **fuzzy matching** on the `title` field.
+
+This allows users to find courses even with small typos.
+
+### Example:
+
+```bash
+curl "http://localhost:8080/api/search?q=dinors"

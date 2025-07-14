@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -45,4 +46,9 @@ public class SearchController {
 
         return searchService.searchCourses(request);
     }
+    @GetMapping("/api/search/suggest")
+    public List<String> suggestCourseTitles(@RequestParam String q) {
+        return searchService.suggestCourseTitles(q);
+    }
+
 }

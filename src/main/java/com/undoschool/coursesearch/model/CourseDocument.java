@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.core.suggest.Completion;
+
 
 import java.time.ZonedDateTime;
 
@@ -21,6 +24,9 @@ public class CourseDocument {
 
     @Field(type = FieldType.Text)  // Full-text search
     private String title;
+
+    @Field(type = FieldType.Completion)
+    private Completion suggest;
 
     @Field(type = FieldType.Text)  // Full-text search
     private String description;

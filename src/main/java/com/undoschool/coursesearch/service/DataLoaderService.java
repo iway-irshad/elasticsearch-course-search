@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import co.elastic.clients.elasticsearch._types.mapping.Completion;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -25,6 +26,13 @@ public class DataLoaderService {
         try {
             InputStream inputStream = getClass().getResourceAsStream("/sample-courses.json");
             List<CourseDocument> courses = objectMapper.readValue(inputStream, new TypeReference<>() {});
+            // ✅ Populate the suggested field for autocomplete
+            for (CourseDocument doc : courses) {
+                if (doc.getTitle() != null) {
+                    doc.setSuggest(new Completion(List.of(doc.getTitle())));
+                }
+            }
+
             courseRepository.saveAll(courses);
             log.info("✅ Successfully indexed {} courses into Elasticsearch", courses.size());
         } catch (Exception e) {
