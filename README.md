@@ -115,3 +115,16 @@ This allows users to find courses even with small typos.
 
 ```bash
 curl "http://localhost:8080/api/search?q=dinors"
+
+```
+## Assignment B – Autocomplete & Fuzzy Search (Implemented on `assignment-b-autocomplete-fuzzy` branch)
+
+### Status: Partial
+
+- ✅ Fuzzy search implemented on `title` field using `fuzziness: AUTO`
+- ⚠️ Autocomplete via Completion Suggester is **not working fully** due to:
+    - Incompatibility with `Completion` field in Elasticsearch Java Client v8.13.4
+    - The `co.elastic.clients.elasticsearch._types.mapping.Completion` class was removed in this version
+- ✅ We isolated this in a separate branch for independent review
+
+
